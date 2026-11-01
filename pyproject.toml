@@ -1,0 +1,21 @@
+[project]
+name = "hackytube"
+version = "0.1.0"
+description = "Pipeline that turns the Hacker News comment dump into a catalog of HN-recommended YouTube videos"
+requires-python = ">=3.13"
+dependencies = [
+    "duckdb>=2.0.0",
+    "pyarrow>=26.0.0",
+    "pytz>=2026.6",
+]
+
+[tool.ruff]
+line-length = 130
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

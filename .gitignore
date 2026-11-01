@@ -1,0 +1,10 @@
+data/
+.venv/
+node_modules/
+web/dist/
+.DS_Store
+__pycache__/
+web/public/data/
+e2e/.public/
+test-results/
+playwright-report/
