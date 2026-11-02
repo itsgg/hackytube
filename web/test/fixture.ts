@@ -35,3 +35,22 @@ export const details: Record<string, Detail> = {
 export function catalog(): Catalog {
   return { topics, videos, built: '2026-11-01', byId: new Map(videos.map((v, i) => [v.v, i])) }
 }
+
+// Derived views, small and hand-written to match the fixture catalog.
+export const map = {
+  x: [5000, 5300, 5600, 2000, 2300, 8000],
+  y: [5000, 5200, 4800, 2000, 2400, 8000],
+  clusters: [
+    { id: 0, x: 5300, y: 5000, r: 600, n: 3 },
+    { id: 1, x: 2150, y: 2200, r: 400, n: 2 },
+    { id: 2, x: 8000, y: 8000, r: 300, n: 1 },
+  ],
+}
+
+export const trends = {
+  years: [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022],
+  total: [400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 400],
+  series: { '0': [40, 40, 40, 40, 40, 200, 200, 200, 200, 200, 200], '1': [100, 100, 100, 100, 100, 20, 20, 20, 20, 20, 20], '2': [10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10] },
+}
+
+export const threads = [{ sid: 900, title: 'Ask HN: best talks?', points: 512, date: '2012-01-02', people: 3, videos: [0, 1, 2] }]

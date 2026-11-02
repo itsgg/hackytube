@@ -6,6 +6,11 @@ import { Vouches } from './components'
 import { duration, loadCatalog, midFrame, type Catalog } from './data'
 import { isMuted, titleOf, useHistory } from './history'
 import Home from './Home'
+import MapView from './MapView'
+import Path from './Path'
+import { ThreadPage, Threads } from './Threads'
+import Trends from './Trends'
+import TV from './TV'
 import Settings from './Settings'
 import Watch from './Watch'
 
@@ -105,6 +110,8 @@ const KEYS: [string, string][] = [
   ['g h', 'Front page'],
   ['g t', 'Topics'],
   ['g c', 'Channels'],
+  ['g v', 'hackytube TV'],
+  ['g m', 'The map'],
   ['g s', 'Saved'],
   ['?', 'This list'],
 ]
@@ -146,8 +153,13 @@ function Shell({ cat }: { cat: Catalog }) {
     nav(`/watch/${pick.v}`)
   }
 
+  // TV is lean-back and full screen: it owns the keyboard, and the map wants every pixel below the bar.
+  const tv = loc.pathname.startsWith('/tv')
+  const fullBleed = tv || loc.pathname === '/map'
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (tv) return
       if ((e.target as HTMLElement).closest('input, textarea, select') || e.metaKey || e.ctrlKey || e.altKey) return
       const k = e.key
       if (pending.current === 'g') {
@@ -155,6 +167,8 @@ function Shell({ cat }: { cat: Catalog }) {
         if (k === 'h') nav('/')
         if (k === 't') nav('/topics')
         if (k === 'c') nav('/channels')
+        if (k === 'm') nav('/map')
+        if (k === 'v') nav('/tv')
         if (k === 's') nav('/saved')
         return
       }
@@ -183,6 +197,7 @@ function Shell({ cat }: { cat: Catalog }) {
 
   return (
     <>
+      {!tv && (
       <header className="topbar">
         <Link to="/" className="brand" aria-label="hackytube front page">
           <span className="logo" aria-hidden>
@@ -191,12 +206,14 @@ function Shell({ cat }: { cat: Catalog }) {
           <span className="word">hackytube</span>
         </Link>
         <nav className="nav">
+          <NavLink to="/tv">tv</NavLink>
+          <NavLink to="/map">map</NavLink>
+          <NavLink to="/trends">trends</NavLink>
+          <NavLink to="/threads">threads</NavLink>
           <NavLink to="/topics">topics</NavLink>
           <NavLink to="/channels">channels</NavLink>
           <NavLink to="/all">everything</NavLink>
           <NavLink to="/saved">saved</NavLink>
-          <NavLink to="/history">watched</NavLink>
-          <NavLink to="/settings">settings</NavLink>
         </nav>
         <button className="surprise" onClick={surprise} title="Play a random well-loved video you haven't seen (r)">
           Surprise me
@@ -206,6 +223,7 @@ function Shell({ cat }: { cat: Catalog }) {
           <kbd>/</kbd>
         </button>
       </header>
+      )}
 
       <Routes>
         <Route path="/" element={<Home cat={cat} />} />
@@ -219,20 +237,32 @@ function Shell({ cat }: { cat: Catalog }) {
         <Route path="/channels" element={<Channels cat={cat} />} />
         <Route path="/channel/:slug" element={<Browse key={loc.pathname} cat={cat} mode="channel" />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/map" element={<MapView cat={cat} />} />
+        <Route path="/trends" element={<Trends cat={cat} />} />
+        <Route path="/path" element={<Path cat={cat} />} />
+        <Route path="/threads" element={<Threads cat={cat} />} />
+        <Route path="/thread/:sid" element={<ThreadPage cat={cat} />} />
+        <Route path="/tv" element={<TV cat={cat} />} />
+        <Route path="/tv/:ch" element={<TV cat={cat} />} />
         <Route path="*" element={<main className="empty"><h1>Nothing here</h1><p><Link to="/">Go to the front page</Link></p></main>} />
       </Routes>
 
+      {!fullBleed && (
       <footer className="foot">
         <p>
           Titles marked by <a href="https://dearrow.ajay.app">DeArrow</a> users replace clickbait where the community voted. Every video here was recommended in a Hacker News comment between {Math.min(...cat.videos.map((v) => v.y0))} and{' '}
           {Math.max(...cat.videos.map((v) => v.y1))}. Inspired by Andrej Karpathy's HackerTube. Press <kbd>?</kbd> for shortcuts.
         </p>
         <p>
+          <Link to="/path">Six degrees of HN</Link>
+          <Link to="/history">Watched</Link>
+          <Link to="/settings">Settings</Link>
           <a href={`${import.meta.env.BASE_URL}data/feed.xml`}>RSS of newly recommended videos</a>
           <a href={`${import.meta.env.BASE_URL}data/catalog.json`}>Download the catalog as JSON</a>
           <a href="https://github.com/itsgg/hackytube">Source on GitHub</a>
         </p>
       </footer>
+      )}
 
       <Search cat={cat} open={searching} onClose={() => setSearching(false)} />
       {help && (

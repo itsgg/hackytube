@@ -21,6 +21,7 @@ from xml.sax.saxutils import escape
 import duckdb
 
 from common import chapters_from, clean
+from views import layout, threads, trends
 
 ROOT = Path(__file__).resolve().parent.parent
 D = ROOT / "data"
@@ -190,6 +191,10 @@ def main():
     catalog = {"topics": topic_out, "videos": videos, "built": date.today().isoformat()}
     (WEB / "catalog.json").write_text(json.dumps(catalog, ensure_ascii=False, separators=(",", ":")))
     (WEB / "feed.xml").write_text(feed(videos, site))
+    compact = {"ensure_ascii": False, "separators": (",", ":")}
+    (WEB / "map.json").write_text(json.dumps(layout(videos), **compact))
+    (WEB / "trends.json").write_text(json.dumps(trends(videos, vouch), **compact))
+    (WEB / "threads.json").write_text(json.dumps(threads(videos, vouch), **compact))
     shards = defaultdict(dict)
     for v in videos:
         m = meta[v["v"]]

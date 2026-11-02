@@ -133,6 +133,39 @@ function YearStrip({ cat }: { cat: Catalog }) {
   )
 }
 
+const BUDGETS = [10, 20, 45, 90] as const
+
+/** "I have N minutes": the most recommended videos you haven't seen that fit, without leaving much on the table. */
+function TimeBudget({ cat }: { cat: Catalog }) {
+  const h = useHistory()
+  const [mins, setMins] = useState<number | null>(null)
+  const picks = useMemo(() => {
+    if (!mins) return []
+    const max = mins * 60
+    return cat.videos.flatMap((v, i) => (v.d > max * 0.55 && v.d <= max && !h.watched[v.v] && !isMuted(v, h) ? [i] : [])).slice(0, 4)
+  }, [mins, cat, h])
+  return (
+    <section className="budget">
+      <h2>I have</h2>
+      <div className="seg" role="group" aria-label="How much time you have">
+        {BUDGETS.map((m) => (
+          <button key={m} aria-pressed={mins === m} onClick={() => setMins(mins === m ? null : m)}>
+            {m} minutes
+          </button>
+        ))}
+      </div>
+      <Link to="/tv" className="tv-cta">
+        Or just turn on hackytube TV
+      </Link>
+      {mins && (
+        <div className="budget-picks">
+          {picks.length ? picks.map((i) => <Tile key={i} v={cat.videos[i]} cat={cat} />) : <p className="empty-note flush">Nothing unwatched fits {mins} minutes.</p>}
+        </div>
+      )}
+    </section>
+  )
+}
+
 export default function Home({ cat }: { cat: Catalog }) {
   const h = useHistory()
   const fy = useMemo(() => forYou(cat, h), [cat, h])
@@ -154,6 +187,7 @@ export default function Home({ cat }: { cat: Catalog }) {
       <h1 className="sr">hackytube: YouTube videos Hacker News recommended</h1>
       <Hero cat={cat} />
       <YearStrip cat={cat} />
+      <TimeBudget cat={cat} />
       {hasHistory && <Shelf title="For you" note="From what you watched, and what HN recommended alongside it" items={fy} cat={cat} />}
       <TopTen cat={cat} />
       {!hasHistory && <Shelf title="Start anywhere" note="The strongest pick from each topic" items={fy} cat={cat} />}

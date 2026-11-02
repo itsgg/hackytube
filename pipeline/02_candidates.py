@@ -38,6 +38,23 @@ def videos_in(*fields: str | None) -> list[tuple[str, int | None]]:
     return out
 
 
+def find_roots(c) -> None:
+    """Create table roots(start, root): each comment in `cand` walked up `idx` to the story it sits under.
+
+    Stories carry parent 0 in the dump, not null, so 0 ends the walk too.
+    """
+    c.execute(
+        """create or replace table roots as
+           with recursive up(start, cur, depth) as (
+             select distinct id, id, 0 from cand where type = 2
+             union all
+             select u.start, i.parent, u.depth + 1 from up u join idx i on i.id = u.cur
+             where coalesce(i.parent, 0) <> 0 and u.depth < 200
+           )
+           select start, arg_max(cur, depth) as root from up group by start"""
+    )
+
+
 def finished():
     """Months whose extraction is complete (both files present and idx no longer being written)."""
     out = []
@@ -65,16 +82,7 @@ def main():
 
     # Walk each comment up to its root story using the slim id/parent index.
     c.execute("create table idx as select id, parent, title, score from read_parquet(?)", [[b for _, b in months]])
-    c.execute(
-        """create table roots as
-           with recursive up(start, cur, depth) as (
-             select distinct id, id, 0 from cand where type = 2
-             union all
-             select u.start, i.parent, u.depth + 1 from up u join idx i on i.id = u.cur
-             where i.parent is not null and u.depth < 200
-           )
-           select start, arg_max(cur, depth) as root from up group by start"""
-    )
+    find_roots(c)
     c.execute(
         f"""copy (
           select cand.*, coalesce(r.root, cand.id) as story_id,

@@ -74,3 +74,14 @@ def test_no_chapters_when_rules_fail(desc):
 
 def test_chapters_skip_out_of_order_stamps():
     assert chapters_from("0:00 A\n5:00 B\n3:00 back-reference\n9:00 C") == [["A", 0], ["B", 300], ["C", 540]]
+
+
+def test_comments_walk_up_to_their_story_not_past_it(cand):
+    import duckdb
+
+    c = duckdb.connect()
+    # story 10 (parent 0, as in the dump) <- comment 11 <- comment 12; story 20 with a null parent <- comment 21
+    c.execute("create table idx as select * from (values (10, 0), (11, 10), (12, 11), (20, null), (21, 20)) t(id, parent)")
+    c.execute("create table cand as select * from (values (12, 2), (21, 2), (10, 1)) t(id, type)")
+    cand.find_roots(c)
+    assert dict(c.execute("select start, root from roots").fetchall()) == {12: 10, 21: 20}

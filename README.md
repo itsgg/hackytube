@@ -10,6 +10,12 @@ Inspired by Andrej Karpathy's [HackerTube](https://karpathy.bearblog.dev/hacker-
 - **Ranking by people.** Videos rank by how many distinct people recommended them and for how many years, so a talk people kept citing for a decade beats one that trended for a week.
 - **For you, with no account.** Watch history and saves stay in your browser and feed a local recommender.
 - **Search** across titles, channels, topics and what people said, plus keyboard shortcuts for everything (`?` lists them).
+- **hackytube TV.** Every topic is a channel on a wall-clock schedule, so everyone on channel 7 sees the same moment. Surf with arrows or numbers; the caption is what HN said about the video.
+- **The constellation.** Every video as a star, clustered by topic, brightest at each core. Hover to see what HN recommended alongside it; zoom in and stars become thumbnails.
+- **How HN's taste moved.** Each topic's share of recommendations per year, rising to fading, as small multiples with a table view.
+- **Threads that became playlists.** Every "Ask HN: best talks?" style thread, playable on YouTube in one click.
+- **Six degrees.** The shortest chain of shared HN threads between any two videos, each hop citing its thread.
+- **Honest titles and blocking.** DeArrow titles (with the original one click away), hide a video, block a channel, RSS, chapters, "I have 20 minutes".
 
 ## How the data is made
 
@@ -20,7 +26,8 @@ Inspired by Andrej Karpathy's [HackerTube](https://karpathy.bearblog.dev/hacker-
 | 3 | `03_label.py` | An LLM scores each comment 0 to 3 for how strongly it recommends the video and pulls out a verbatim quote saying why. Most-recommended videos go first, so a partial run is already useful. |
 | 4 | `04_meta.py` | Fetches title, channel, duration and availability from YouTube. Removed, private and non-embeddable videos are dropped. |
 | 5 | `05_topics.py` | An LLM designs 36 to 48 shelves from the top videos, then files every video under one or two. |
-| 6 | `06_build.py` | Writes `web/public/data/catalog.json` and per-video comment shards. |
+| 6 | `06_build.py` | Writes `web/public/data/`: the catalog, per-video comment shards, the RSS feed, the map layout, topic trends and thread playlists (`views.py`). |
+| 7 | `07_dearrow.py` | Looks up DeArrow's crowd-voted titles; rebuild to pick them up. |
 
 A video makes the catalog when at least two different people recommended it, one person called it a must-watch, or its submission reached 100 points.
 
@@ -36,6 +43,10 @@ make dev       # http://127.0.0.1:5180
 ```
 
 `make watch` rebuilds the catalog every 5 minutes, so the site fills in while labeling runs. `make site` produces a static build in `web/dist` that any file host can serve.
+
+To keep it running on a Mac: `make service` installs a LaunchAgent that serves `web/dist` on 127.0.0.1:5180 across reboots, `make publish` rebuilds and swaps the new build in, and `make refresh` runs the remaining data steps in the background. Put the public URL in `.site-url` so feed links point at it.
+
+`make test` runs pytest, Vitest and the Playwright end-to-end suite (against a small fixture catalog, offline). CI runs the same on every push.
 
 ## Layout
 

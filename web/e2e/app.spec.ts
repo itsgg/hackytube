@@ -18,6 +18,7 @@ test('front page leads with a real recommendation and the ranking', async ({ pag
 
 test('search finds a video by what people said and opens it', async ({ page, isMobile }) => {
   await page.goto('/')
+  await expect(page.locator('.hero-q')).toBeVisible() // shortcuts attach once the catalog has loaded
   if (isMobile) await page.getByRole('button', { name: /search/i }).click()
   else await page.keyboard.press('/')
   await page.getByPlaceholder(/search titles/i).fill('prescient')
@@ -79,8 +80,9 @@ test('topics, channels and years all lead to videos', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('What HN was recommending in 2015')
 })
 
-test.fixme('watching shapes the For you shelf and history', async ({ page }) => {
+test('watching shapes the For you shelf and history', async ({ page }) => {
   await page.goto('/watch/CCCCCCCCCCC')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('The Birth & Death of JavaScript') // visit recorded on render
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'For you' })).toBeVisible()
   await page.goto('/history')
@@ -95,9 +97,10 @@ test('dark theme setting applies and persists', async ({ page }) => {
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
 })
 
-test.fixme('keyboard shortcuts open help and surprise me', async ({ page, isMobile }) => {
+test('keyboard shortcuts open help and surprise me', async ({ page, isMobile }) => {
   test.skip(isMobile, 'keyboard shortcuts are a desktop feature')
   await page.goto('/')
+  await expect(page.locator('.hero-q')).toBeVisible() // shortcuts attach once the catalog has loaded
   await page.keyboard.press('?')
   await expect(page.getByRole('dialog', { name: 'Keyboard shortcuts' })).toBeVisible()
   await page.keyboard.press('Escape')

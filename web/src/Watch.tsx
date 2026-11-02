@@ -66,7 +66,8 @@ function Comment({ x, onSeek }: { x: Vouch; onSeek: (t: number) => void }) {
           </button>
         )}
         <a href={hnItem(x.sid)} className="c-thread">
-          in “{x.st}”{x.sp ? `, ${x.sp} points` : ''}
+          {x.st ? `in “${x.st}”` : 'on Hacker News'}
+          {x.sp ? `, ${x.sp} points` : ''}
         </a>
       </div>
     </li>
@@ -235,6 +236,12 @@ export default function Watch({ cat }: { cat: Catalog }) {
             <button className="quiet" onClick={() => toggleHidden(v.v)}>
               {h.hidden[v.v] ? 'Show in feeds again' : 'Not interested'}
             </button>
+            <Link className="quiet" to={`/map?v=${v.v}`}>
+              See it on the map
+            </Link>
+            <Link className="quiet" to={`/path?from=${v.v}`}>
+              Six degrees from here
+            </Link>
             {v.c && (
               <button className="quiet" onClick={() => toggleBlocked(v.c)}>
                 {blocked ? `Unblock ${v.c}` : `Block ${v.c}`}
