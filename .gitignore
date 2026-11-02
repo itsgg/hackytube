@@ -8,3 +8,6 @@ web/public/data/
 e2e/.public/
 test-results/
 playwright-report/
+web/dist.next/
+web/dist.old/
+.site-url
