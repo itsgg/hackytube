@@ -55,3 +55,20 @@ test('time budget suggests videos that fit', async ({ page }) => {
   await page.getByRole('button', { name: '10 minutes' }).click()
   await expect(page.locator('.budget-picks [data-tile]')).toHaveCount(1) // only the 7:50 Feynman clip fits
 })
+
+test('wide screens keep paragraphs readable', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'a desktop-width check')
+  await page.setViewportSize({ width: 2400, height: 1000 })
+  for (const path of ['/', '/path', '/trends', '/threads', '/topics', '/channels', '/settings', '/all']) {
+    await page.goto(path)
+    await expect(page.locator('h1').first()).toBeAttached()
+    // Any paragraph with a sentence or more of text must get at least a few words per line.
+    const squeezed = await page.evaluate(() =>
+      [...document.querySelectorAll('main p')]
+        .filter((p) => (p.textContent ?? '').length > 60 && p.getBoundingClientRect().width > 0)
+        .filter((p) => p.getBoundingClientRect().width - parseFloat(getComputedStyle(p).paddingLeft) - parseFloat(getComputedStyle(p).paddingRight) < 260)
+        .map((p) => (p.textContent ?? '').slice(0, 40)),
+    )
+    expect(squeezed, path).toEqual([])
+  }
+})

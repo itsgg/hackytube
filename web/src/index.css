@@ -1750,14 +1750,15 @@ kbd {
 }
 
 /* Trends: small multiples in one validated hue */
+/* Capped text blocks: the cap is for the text, so the page edge padding goes on top of it. */
 .trend-lede {
-  max-width: 62ch;
+  max-width: calc(62ch + 2 * var(--edge));
   padding: 0 var(--edge);
   margin: 4px 0 6px;
   font: 500 clamp(18px, 2vw, 24px) / 1.3 var(--display);
 }
 .trend-note {
-  max-width: 76ch;
+  max-width: calc(76ch + 2 * var(--edge));
   padding: 0 var(--edge);
   color: var(--sub);
 }
