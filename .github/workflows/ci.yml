@@ -7,17 +7,17 @@ on:
 
 jobs:
   pipeline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Playwright 1.56 has no Chromium build for newer Ubuntu
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - run: uv sync
-      - run: uvx ruff check pipeline tests
-      - run: uvx ruff format --check pipeline tests
+      - run: uv run ruff check pipeline tests
+      - run: uv run ruff format --check pipeline tests
       - run: uv run pytest -q
 
   web:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # Playwright 1.56 has no Chromium build for newer Ubuntu
     defaults:
       run:
         working-directory: web

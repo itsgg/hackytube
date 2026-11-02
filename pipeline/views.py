@@ -87,7 +87,7 @@ def layout(videos: list, iterations: int = 400, scale: int = 10000) -> dict:
     xs, ys = [p[0] for p in placed] or [0], [p[1] for p in placed] or [0]
     lo_x, lo_y = min(xs) - GAP, min(ys) - GAP
     span = max(max(xs) - lo_x, max(ys) - lo_y) + GAP or 1
-    q = lambda v, lo: round((v - lo) / span * scale)  # noqa: E731
+    q = lambda v, lo: round((v - lo) / span * scale)
     return {
         "x": [q(p[0], lo_x) if p else -1 for p in xy],
         "y": [q(p[1], lo_y) if p else -1 for p in xy],

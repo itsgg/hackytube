@@ -19,7 +19,6 @@ from pathlib import Path
 from xml.sax.saxutils import escape
 
 import duckdb
-
 from common import chapters_from, clean
 from views import layout, threads, trends
 
@@ -152,12 +151,36 @@ def main():
     vouch = defaultdict(dict)
     for vid, by, at, cid, sid, st, sp, s, quote, text, ts in recs:
         if vid in meta:
-            add_vouch(vouch[vid], {"by": by, "at": at.replace(" ", "T"), "cid": cid, "sid": sid, "st": st or "",
-                                   "sp": sp, "s": s, "q": (quote or "").strip(), "x": clean(text)[:2400], "t": ts})  # fmt: skip
+            add_vouch(
+                vouch[vid],
+                {
+                    "by": by,
+                    "at": at.replace(" ", "T"),
+                    "cid": cid,
+                    "sid": sid,
+                    "st": st or "",
+                    "sp": sp,
+                    "s": s,
+                    "q": (quote or "").strip(),
+                    "x": clean(text)[:2400],
+                    "t": ts,
+                },
+            )
     for vid, by, at, sid, title, score in subs:
         if vid in meta and by not in vouch[vid]:
-            vouch[vid][by] = {"by": by, "at": at.replace(" ", "T"), "cid": sid, "sid": sid, "st": title or "", "sp": score,
-                              "s": 2, "q": "", "x": f"Submitted to Hacker News as “{title}”.", "t": None, "pts": score}  # fmt: skip
+            vouch[vid][by] = {
+                "by": by,
+                "at": at.replace(" ", "T"),
+                "cid": sid,
+                "sid": sid,
+                "st": title or "",
+                "sp": score,
+                "s": 2,
+                "q": "",
+                "x": f"Submitted to Hacker News as “{title}”.",
+                "t": None,
+                "pts": score,
+            }
 
     videos = [row for vid, people in vouch.items() if (row := summarize(vid, list(people.values()), meta[vid]))]
     videos.sort(key=lambda v: (-v["w"], -v["n"], v["v"]))

@@ -11,7 +11,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import duckdb
-
 from common import clean
 from llm import chat, json_block
 
@@ -66,7 +65,7 @@ def main():
             select c.id, c.vid, c.text, c.story_title from '{CAND}' c join p using (vid)
             where c.type = 2 and p.people >= {min_people} order by p.people desc, c.vid, c.id"""
     ).fetchall()
-    todo = [dict(id=a, vid=b, text=t, story_title=s or "") for a, b, t, s in rows if f"{a}:{b}" not in done]
+    todo = [{"id": a, "vid": b, "text": t, "story_title": s or ""} for a, b, t, s in rows if f"{a}:{b}" not in done]
     if limit:
         todo = todo[:limit]
     batches = [todo[i : i + BATCH] for i in range(0, len(todo), BATCH)]

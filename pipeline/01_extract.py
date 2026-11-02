@@ -4,6 +4,7 @@ import json
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+
 import duckdb
 
 OUT = Path(__file__).resolve().parent.parent / "data" / "raw"
@@ -30,7 +31,7 @@ def one(f):
                 f"create or replace temp table t as select id, type, \"by\", time, text, parent, url, score, title, descendants, deleted, dead from '{BASE}{f}'"
             )
             break
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001 - network reads fail transiently; retried
             if attempt == 3:
                 return f, f"fail {e}"
     c.sql(f"""copy (select * from t where coalesce(deleted,0)=0 and coalesce(dead,0)=0 and

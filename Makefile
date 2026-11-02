@@ -25,7 +25,7 @@ dev:
 site:
 	cd web && npm run build
 lint:
-	uvx ruff check pipeline tests && cd web && npm run lint && npm run typecheck
+	uv run ruff check pipeline tests && uv run ruff format --check pipeline tests && cd web && npm run lint && npm run typecheck
 test:
 	uv run pytest -q && cd web && npm test && npm run e2e
 

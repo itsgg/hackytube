@@ -28,7 +28,7 @@ def api_item(**over):
             "publishedAt": "2009-10-25T06:57:33Z",
             "description": "0:00 a\n1:00 b\n2:00 c",
             "liveBroadcastContent": "none",
-        },  # fmt: skip
+        },
         "contentDetails": {"duration": "PT3M33S"},
         "status": {"privacyStatus": "public", "embeddable": True},
     }

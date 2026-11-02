@@ -19,7 +19,6 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import duckdb
-
 from common import chapters_from
 
 ROOT = Path(__file__).resolve().parent.parent
