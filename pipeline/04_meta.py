@@ -114,8 +114,13 @@ def wanted(c) -> list:
     return [r[0] for r in c.execute(sql).fetchall()]
 
 
-def final(record: dict) -> bool:
-    """Settled records are skipped on rerun; failed or bot-walled fetches are retried."""
+def final(record: dict, have_key: bool = bool(KEY)) -> bool:
+    """Settled records are skipped on rerun; failed or bot-walled fetches are retried.
+
+    With an API key, oEmbed-only records are upgraded: oEmbed has no duration or chapters.
+    """
+    if have_key and record.get("source") == "oembed" and record.get("status") == "OK":
+        return False
     return record.get("status") in ("OK", "GONE", "PRIVATE", "ERROR", "UNPLAYABLE")
 
 

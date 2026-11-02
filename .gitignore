@@ -11,3 +11,4 @@ playwright-report/
 web/dist.next/
 web/dist.old/
 .site-url
+.env

@@ -113,3 +113,11 @@ def test_label_maps_replies_back_to_pairs(step, monkeypatch):
     ]
     # Pairs the model skipped are left out (and retried next run); keys it invented are ignored.
     assert label.label(batch) == [{"k": "2:BBBBBBBBBBB", "s": 3, "quote": "must watch"}]
+
+
+def test_an_api_key_upgrades_oembed_records(meta):
+    oembed = {"vid": "x", "status": "OK", "source": "oembed"}
+    assert meta.final(oembed, have_key=False)
+    assert not meta.final(oembed, have_key=True)  # refetch to get duration and chapters
+    assert meta.final({"vid": "x", "status": "OK", "source": "api"}, have_key=True)
+    assert meta.final({"vid": "x", "status": "GONE", "source": "oembed"}, have_key=True)
